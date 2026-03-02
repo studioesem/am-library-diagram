@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AM Archives & Library — Key Service Areas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #F5F0EB;
+    --warm-white: #FAF7F3;
+    --charcoal: #2D2D2D;
+    --dark: #1A1A1A;
+    --rose: #C4807A;
+    --rose-dark: #A8635D;
+    --teal: #2B6B6A;
+    --teal-light: #3A8A89;
+    --olive: #8B8B5E;
+    --olive-light: #A5A57A;
+    --sand: #D4C9B8;
+  }
+
+  body {
+    background: var(--cream);
+    font-family: 'Playfair Display', Georgia, serif;
+    color: var(--charcoal);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 20px 48px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .header-pips {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .pip { width: 13px; height: 13px; }
+  .pip-round { border-radius: 50%; }
+
+  .header h1 {
+    font-size: 26px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dark);
+    margin-bottom: 4px;
+  }
+
+  .header .subtitle {
+    font-size: 15px;
+    color: var(--rose);
+    font-style: italic;
+    letter-spacing: 0.02em;
+  }
+
+  .header .meta {
+    font-size: 11px;
+    color: #aaa;
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 6px;
+  }
+
+  .diagram-container {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    flex-shrink: 0;
+  }
+
+  .diagram-container svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .node-group { cursor: pointer; }
+  .node-group:hover .node-circle { filter: brightness(1.02); }
+
+  .node-circle,
+  .node-text,
+  .connector-line {
+    transition: all 0.3s ease;
+  }
+
+  .detail-panel {
+    width: 600px;
+    min-height: 80px;
+    margin-top: -16px;
+  }
+
+  .detail-card {
+    background: var(--warm-white);
+    border: 1px solid rgba(0,0,0,0.06);
+    border-top-width: 3px;
+    padding: 24px 28px;
+    opacity: 0;
+    transform: translateY(8px);
+    animation: fadeIn 0.3s ease forwards;
+  }
+
+  .detail-card h2 {
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    margin-bottom: 8px;
+  }
+
+  .detail-card p {
+    font-size: 14px;
+    line-height: 1.65;
+    margin-bottom: 16px;
+    font-family: 'DM Sans', 'Playfair Display', serif;
+    color: var(--charcoal);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag {
+    font-size: 11.5px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 5px 12px;
+    border: 1px solid;
+    letter-spacing: 0.01em;
+  }
+
+  .placeholder {
+    text-align: center;
+    padding: 40px 20px;
+    color: #aaa;
+    font-style: italic;
+    font-size: 14px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-pips">
+    <div class="pip" style="background: var(--rose); transform: rotate(2deg)"></div>
+    <div class="pip" style="background: var(--teal); transform: rotate(-1deg)"></div>
+    <div class="pip pip-round" style="background: var(--olive); width:10px; height:10px"></div>
+  </div>
+  <h1>Archives & Library</h1>
+  <div class="subtitle">Key Service Areas</div>
+  <div class="meta">AM Archives & Library Strategic Review — February 2026</div>
+</div>
+
+<div class="diagram-container">
+  <svg viewBox="0 0 600 600" id="diagram"></svg>
+</div>
+
+<div class="detail-panel" id="detailPanel">
+  <div class="placeholder">Select a service area to explore</div>
+</div>
+
+<script>
+const SERVICE_AREAS = [
+  {
+    id: "research",
+    label: ["Research", "Support"],
+    color: "#2B6B6A",
+    angle: 0,
+    description: "Supporting AMRI scientists, external researchers, university students and scholars through specialist reference services, access to comprehensive natural history literature, and interlibrary loans.",
+    details: ["AMRI scientific research", "External researcher access", "Interlibrary loans (ILRS)", "Reference enquiries", "Electronic databases & indexes"],
+  },
+  {
+    id: "collections",
+    label: ["Collection", "Management"],
+    color: "#C4807A",
+    angle: 51.4,
+    description: "Acquiring, cataloguing, preserving and managing the AMRL's holdings across the main library and sectional research libraries embedded in scientific departments.",
+    details: ["Acquisition (purchase, exchange, donation)", "Cataloguing & online databases", "Sectional library oversight", "Disposal & de-accessioning", "Stock takes & maintenance"],
+  },
+  {
+    id: "rare",
+    label: ["Rare & Special", "Collections"],
+    color: "#1A1A1A",
+    angle: 102.8,
+    description: "Custodianship of irreplaceable pre-1900 natural history materials, hand-coloured plates, expedition reports, and named special collections including the Mel Ward and Swainson Collections.",
+    details: ["Pre-1900 natural history works", "Hand-coloured plates & illustrations", "Named special collections", "Limited editions & association copies", "Heritage significance assessment"],
+  },
+  {
+    id: "archives",
+    label: ["Archives &", "Heritage"],
+    color: "#8B8B5E",
+    angle: 154.2,
+    description: "Institutional memory of Australia's oldest museum — expedition records, correspondence, historical documentation tracing the Museum's role in Australian science since 1836.",
+    details: ["Institutional archives", "Expedition & discovery records", "Historical correspondence", "Museum history documentation", "Heritage Act (s.170) compliance"],
+  },
+  {
+    id: "access",
+    label: ["Public Access", "& Reference"],
+    color: "#3A8A89",
+    angle: 205.6,
+    description: "Providing access to collections for the general public, government institutions, authors and scholars through the reading room and online reference services.",
+    details: ["Reading room access", "Online reference service", "Public enquiry handling", "Government & institutional access", "Visitor engagement"],
+  },
+  {
+    id: "digital",
+    label: ["Digital", "Access"],
+    color: "#A8635D",
+    angle: 257,
+    description: "Enabling discovery through online catalogues, finding aids, and electronic resources — the foundation for future digital innovation, open access, and computational research.",
+    details: ["Online catalogues & finding aids", "Electronic journals & serials", "Digital collection discovery", "Biodiversity Heritage Library links", "Future: open access & APIs"],
+  },
+  {
+    id: "conservation",
+    label: ["Conservation", "& Care"],
+    color: "#D4C9B8",
+    textColor: "#5A5A5A",
+    angle: 308.4,
+    description: "Preserving the physical integrity of collections through environmental controls, handling protocols, disaster preparedness, and collaboration with the Museum's Materials Conservation branch.",
+    details: ["Preventive conservation", "Environmental monitoring", "Disaster recovery planning", "Fragile materials handling", "Security protocols"],
+  },
+];
+
+const CX = 300, CY = 300, RADIUS = 190, NODE_R = 58;
+let activeId = null;
+
+function getPos(angleDeg) {
+  const rad = (angleDeg - 90) * (Math.PI / 180);
+  return { x: CX + RADIUS * Math.cos(rad), y: CY + RADIUS * Math.sin(rad) };
+}
+
+function buildSVG() {
+  const svg = document.getElementById("diagram");
+  svg.innerHTML = "";
+
+  // Connector lines
+  SERVICE_AREAS.forEach(s => {
+    const pos = getPos(s.angle);
+    const isActive = activeId === s.id;
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", CX);
+    line.setAttribute("y1", CY);
+    line.setAttribute("x2", pos.x);
+    line.setAttribute("y2", pos.y);
+    line.setAttribute("stroke", isActive ? s.color : "#D4C9B8");
+    line.setAttribute("stroke-width", isActive ? "2" : "1");
+    if (!isActive) line.setAttribute("stroke-dasharray", "4 4");
+    line.classList.add("connector-line");
+    svg.appendChild(line);
+  });
+
+  // Centre node
+  const centreCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  centreCircle.setAttribute("cx", CX);
+  centreCircle.setAttribute("cy", CY);
+  centreCircle.setAttribute("r", 50);
+  centreCircle.setAttribute("fill", "#FAF7F3");
+  centreCircle.setAttribute("stroke", "#D4C9B8");
+  centreCircle.setAttribute("stroke-width", "1.5");
+  svg.appendChild(centreCircle);
+
+  const centreLines = [
+    { text: "AM", y: CY - 10, size: "11px", weight: "bold", spacing: "0.06em" },
+    { text: "Archives", y: CY + 6, size: "9.5px", weight: "normal", spacing: "0.03em" },
+    { text: "& Library", y: CY + 19, size: "9.5px", weight: "normal", spacing: "0.03em" },
+  ];
+  centreLines.forEach(l => {
+    const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    t.setAttribute("x", CX);
+    t.setAttribute("y", l.y);
+    t.setAttribute("text-anchor", "middle");
+    t.setAttribute("font-size", l.size);
+    t.setAttribute("font-family", "'Playfair Display', Georgia, serif");
+    t.setAttribute("fill", "#2D2D2D");
+    t.setAttribute("font-weight", l.weight);
+    t.setAttribute("letter-spacing", l.spacing);
+    t.textContent = l.text;
+    svg.appendChild(t);
+  });
+
+  // Service nodes
+  SERVICE_AREAS.forEach(s => {
+    const pos = getPos(s.angle);
+    const isActive = activeId === s.id;
+    const textColor = s.textColor || (isActive ? "#fff" : "#2D2D2D");
+
+    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g.classList.add("node-group");
+    g.addEventListener("click", () => {
+      activeId = activeId === s.id ? null : s.id;
+      buildSVG();
+      renderDetail();
+    });
+
+    // Scale on active
+    if (isActive) {
+      g.setAttribute("transform", `translate(${pos.x}, ${pos.y}) scale(1.08) translate(${-pos.x}, ${-pos.y})`);
+    }
+
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", pos.x);
+    circle.setAttribute("cy", pos.y);
+    circle.setAttribute("r", NODE_R);
+    circle.setAttribute("fill", isActive ? s.color : "#FAF7F3");
+    circle.setAttribute("stroke", s.color);
+    circle.setAttribute("stroke-width", isActive ? "2.5" : "1.5");
+    circle.classList.add("node-circle");
+    g.appendChild(circle);
+
+    s.label.forEach((line, i) => {
+      const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      const yOffset = (i - (s.label.length - 1) / 2) * 14;
+      t.setAttribute("x", pos.x);
+      t.setAttribute("y", pos.y + yOffset);
+      t.setAttribute("text-anchor", "middle");
+      t.setAttribute("dominant-baseline", "central");
+      t.setAttribute("font-size", "10.5px");
+      t.setAttribute("font-family", "'Playfair Display', Georgia, serif");
+      t.setAttribute("fill", isActive ? "#fff" : textColor);
+      t.setAttribute("font-weight", isActive ? "600" : "normal");
+      t.setAttribute("letter-spacing", "0.02em");
+      t.classList.add("node-text");
+      t.textContent = line;
+      g.appendChild(t);
+    });
+
+    svg.appendChild(g);
+  });
+}
+
+function renderDetail() {
+  const panel = document.getElementById("detailPanel");
+  const active = SERVICE_AREAS.find(s => s.id === activeId);
+
+  if (!active) {
+    panel.innerHTML = '<div class="placeholder">Select a service area to explore</div>';
+    return;
+  }
+
+  const tagsHTML = active.details.map(d =>
+    `<span class="tag" style="color: ${active.color}; background: ${active.color}0D; border-color: ${active.color}22;">${d}</span>`
+  ).join("");
+
+  panel.innerHTML = `
+    <div class="detail-card" style="border-top-color: ${active.color};">
+      <h2 style="color: ${active.color};">${active.label.join(" ")}</h2>
+      <p>${active.description}</p>
+      <div class="tags">${tagsHTML}</div>
+    </div>
+  `;
+}
+
+// Init
+buildSVG();
+renderDetail();
+</script>
+</body>
+</html>
